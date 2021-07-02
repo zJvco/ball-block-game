@@ -17,18 +17,10 @@ WHITE = (255, 255, 255)
 
 def main():
 
-    def detect_collision_player(Ay, By):
-        distanceY = sqrt(((Ay - By)**2))
+    def detect_collision_player(by, py):
+        distance = sqrt((by - py)**2)
 
-        if distanceY < ball_height and ball_x >= player_x and ball_x <= player_x + player_width:
-            return True
-        else:
-            return False
-
-    def detect_collision_block(Ax, Ay, Bx, By):
-        distance = sqrt(((Ax - Bx)**2) + ((Ay - By)**2))
-
-        if distance < 50:
+        if distance < ball_height:
             return True
         else:
             return False
@@ -43,15 +35,15 @@ def main():
     ball_height = 20
     ball_x = WIDTH / 2 - ball_width / 2
     ball_y = player_y - 50
-    ball_speed_x = 4
-    ball_speed_y = 4
+    ball_speed_x = 6
+    ball_speed_y = 6
 
-    block_img = []
+    block = []
     block_x = []
     block_y = []
-    num_block = 50
-    block_width = 50
-    block_height = 50
+    block_width = 100
+    block_height = 35
+    num_block = 30
     count_bx = 0
     count_by = 0
 
@@ -61,6 +53,11 @@ def main():
 
     while True:
         WINDOW.fill(BLACK)
+
+        player = pygame.Rect(player_x, player_y, player_width, player_height)
+        player_intern = pygame.Rect(
+            player_x + 2, player_y + 2, player_width - 4, player_height - 4)
+        ball = pygame.Rect(ball_x, ball_y, ball_width, ball_height)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -73,53 +70,58 @@ def main():
         if keys[pygame.K_LEFT] and player_x >= 10:
             player_x -= player_speed
 
-        pygame.draw.rect(WINDOW, WHITE, (player_x, player_y,player_width, player_height))
-        pygame.draw.rect(WINDOW, BLACK, (player_x + 2,player_y + 2, player_width - 4, player_height - 4))
+        pygame.draw.rect(WINDOW, WHITE, player)
+        pygame.draw.rect(WINDOW, BLACK, player_intern)
 
-        for i in range(num_block):
-            block_img.append(pygame.transform.scale(pygame.image.load(os.path.join("assets", "block_img_2.PNG")), (block_width, block_height)))
+        for tile in range(num_block):
             block_x.append(count_bx)
             block_y.append(count_by)
+            block.append(pygame.Rect(block_x[tile], block_y[tile], block_width, block_height))
 
-            ball_collision_block = detect_collision_block(ball_x, ball_y, block_x[i], block_y[i])
+            if block_x[tile] >= WIDTH - 100:
+                count_bx = 0
+                count_by += 35
+            else:
+                count_bx += 100
 
-            if ball_collision_block:
-                ball_sound.play()
-                block_img.pop(i)
-                block_x.pop(i)
-                block_y.pop(i)
+            pygame.draw.rect(WINDOW, WHITE, block[tile], 1)
+
+            if ball.colliderect(block[tile]):
+                # ball_sound.play()
+                block_x.pop(tile)
+                block_y.pop(tile)
+                block.pop(tile)
                 num_block -= 1
                 ball_speed_y *= -1
 
-            if block_x[i] >= WIDTH - block_width:
-                count_bx = 0
-                count_by += block_height
-            else:
-                count_bx += block_width
-
-        for i in range(num_block):
-            WINDOW.blit(block_img[i], (block_x[i], block_y[i]))
+        if num_block == 0:
+            block.clear()
+            block_x.clear()
+            block_y.clear()
+            ball_x = WIDTH / 2 - ball_width / 2
+            ball_y = player_y - 50
+            count_bx = 0
+            count_by = 0
+            num_block = 30
 
         if ball_y >= HEIGHT - ball_height:
             ball_x = WIDTH / 2 - ball_width / 2
             ball_y = player_y - 50
         else:
-            pygame.draw.ellipse(WINDOW, WHITE, (ball_x, ball_y,ball_width, ball_height), 1)
+            pygame.draw.ellipse(WINDOW, WHITE, ball, 1)
 
         ball_x -= ball_speed_x
         ball_y -= ball_speed_y
 
         if ball_x <= 0 or ball_x >= WIDTH - ball_width:
-            ball_sound.play()
+            # ball_sound.play()
             ball_speed_x *= -1
         if ball_y <= 0 or ball_y >= HEIGHT - ball_height:
-            ball_sound.play()
+            # ball_sound.play()
             ball_speed_y *= -1
-
-        ball_collision_player = detect_collision_player(ball_y, player_y)
-
-        if ball_collision_player:
-            ball_sound.play()
+        
+        if detect_collision_player(ball_y, player_y) and ball_x >= player_x and ball_x <= player_x + player_width:
+            # ball_sound.play()
             ball_speed_y *= -1
 
         pygame.display.update()
