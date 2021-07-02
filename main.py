@@ -38,14 +38,26 @@ def main():
     ball_speed_x = 6
     ball_speed_y = 6
 
-    block = []
-    block_x = []
-    block_y = []
+    #block = []
     block_width = 100
     block_height = 35
-    num_block = 30
-    count_bx = 0
-    count_by = 0
+
+    phases = [[1, 1, 1, 1, 1],
+              [1, 1, 1, 1, 1],
+              [1, 1, 1, 1, 1],
+              [1, 1, 1, 1, 1],
+              [1, 1, 1, 1, 1],
+              [1, 1, 1, 1, 1],
+              [0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0],
+              [0, 0, 0, 0, 0]]
+
+    # for a in phases:
+    #     for p, k in enumerate(a):
+    #         print(k)
 
     ball_sound = mixer.Sound(os.path.join("assets", "quick_jump.wav"))
 
@@ -73,36 +85,19 @@ def main():
         pygame.draw.rect(WINDOW, WHITE, player)
         pygame.draw.rect(WINDOW, BLACK, player_intern)
 
-        for tile in range(num_block):
-            block_x.append(count_bx)
-            block_y.append(count_by)
-            block.append(pygame.Rect(block_x[tile], block_y[tile], block_width, block_height))
+        y = 0
+        for i, v_row in enumerate(phases):
+            x = 0
+            for j, v_col in enumerate(v_row):
+                if v_col == 1:
+                    tile = pygame.Rect(block_width * x, block_height * y, block_width, block_height)
+                    pygame.draw.rect(WINDOW, WHITE, tile, 1)
 
-            if block_x[tile] >= WIDTH - 100:
-                count_bx = 0
-                count_by += 35
-            else:
-                count_bx += 100
-
-            pygame.draw.rect(WINDOW, WHITE, block[tile], 1)
-
-            if ball.colliderect(block[tile]):
-                # ball_sound.play()
-                block_x.pop(tile)
-                block_y.pop(tile)
-                block.pop(tile)
-                num_block -= 1
-                ball_speed_y *= -1
-
-        if num_block == 0:
-            block.clear()
-            block_x.clear()
-            block_y.clear()
-            ball_x = WIDTH / 2 - ball_width / 2
-            ball_y = player_y - 50
-            count_bx = 0
-            count_by = 0
-            num_block = 30
+                    if ball.colliderect(tile):
+                        phases[i][j] = 0
+                        ball_speed_y *= -1
+                x += 1
+            y += 1
 
         if ball_y >= HEIGHT - ball_height:
             ball_x = WIDTH / 2 - ball_width / 2
@@ -119,7 +114,7 @@ def main():
         if ball_y <= 0 or ball_y >= HEIGHT - ball_height:
             # ball_sound.play()
             ball_speed_y *= -1
-        
+
         if detect_collision_player(ball_y, player_y) and ball_x >= player_x and ball_x <= player_x + player_width:
             # ball_sound.play()
             ball_speed_y *= -1
