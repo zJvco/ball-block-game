@@ -14,13 +14,54 @@ class Game:
         self.FPS = FPS
         self.clock = clock
         self.stage = None
+        self.level = 0
+        self.level_label = None
         self.background = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background_image.png")), (500, 700))
         self.sound.stop_background_music()
 
-    def loop(self, WINDOW, WIDTH, HEIGHT):
+    def check_gameover(self, HEIGHT):
+        if self.ball.ball_y >= HEIGHT - self.ball.ball_size:
+            self.stage = "MENU"
+            self.sound.play_background_music()
+            return True
+
+    def change_phases(self, WIDTH):
+        if len(self.tiles.block) == 0:
+            self.tiles.current_phase += 1
+
+            self.ball.ball_x = WIDTH / 2 - self.ball.ball_size / 2
+            self.ball.ball_y = self.player.player_y - 50
+
+            if self.ball.ball_speed_y < 0:
+                self.ball.ball_speed_y *= -1
+
+            self.level += 1
+
+            if self.tiles.current_phase == 1:
+                self.tiles.phase = self.tiles.phase_1
+            elif self.tiles.current_phase == 2:
+                self.tiles.phase = self.tiles.phase_2
+            elif self.tiles.current_phase == 3:
+                self.tiles.phase = self.tiles.phase_3
+            elif self.tiles.current_phase == 4:
+                self.tiles.phase = self.tiles.phase_4
+            elif self.tiles.current_phase == 5:
+                self.tiles.phase = self.tiles.phase_5
+            elif self.tiles.current_phase == 6:
+                self.tiles.phase = self.tiles.phase_6
+            else:
+                self.stage = "MENU"
+                self.sound.play_background_music()
+                return True
+
+    def draw(self, WINDOW, HEIGHT):
+        WINDOW.blit(self.level_label, (10, HEIGHT - self.level_label.get_height() - 10))
+
+    def loop(self, WINDOW, WIDTH, HEIGHT, font):
         run = True
         while run:
             WINDOW.blit(self.background, (0, 0))
+            self.level_label = font.render(f"Level: {self.level}", 0, self.WHITE)
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -37,37 +78,13 @@ class Game:
 
             self.tiles.draw_tiles(WINDOW, self.WHITE, self.ball, self.sound.ball_sound)
 
-            if self.ball.ball_y >= HEIGHT - self.ball.ball_size:
-                self.stage = "MENU"
-                self.sound.play_background_music()
+            if self.check_gameover(HEIGHT):
+                run = False
+            
+            if self.change_phases(WIDTH):
                 run = False
 
-            if len(self.tiles.block) == 0:
-                self.tiles.current_phase += 1
-
-                self.ball.ball_x = WIDTH / 2 - self.ball.ball_size / 2
-                self.ball.ball_y = self.player.player_y - 50
-
-                if self.ball.ball_speed_y < 0:
-                    self.ball.ball_speed_y *= -1
-
-                if self.tiles.current_phase == 1:
-                    self.tiles.phase = self.tiles.phase_1
-                elif self.tiles.current_phase == 2:
-                    self.tiles.phase = self.tiles.phase_2
-                elif self.tiles.current_phase == 3:
-                    self.tiles.phase = self.tiles.phase_3
-                elif self.tiles.current_phase == 4:
-                    self.tiles.phase = self.tiles.phase_4
-                elif self.tiles.current_phase == 5:
-                    self.tiles.phase = self.tiles.phase_5
-                elif self.tiles.current_phase == 6:
-                    self.tiles.phase = self.tiles.phase_6
-                else:
-                    self.stage = "MENU"
-                    self.sound.play_background_music()
-                    run = False
-
+            self.draw(WINDOW, HEIGHT)
             self.tiles.clear_block_list()
 
             pygame.display.update()

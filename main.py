@@ -20,7 +20,7 @@ class Main:
         self.screen_stage = "MENU"
         self.c_volume = 10
         self.volume = 1
-        self.ball_speed = 10
+        self.ball_speed = 6
 
     def main_loop(self):
         sound = Sound()
@@ -33,7 +33,7 @@ class Main:
                 self.screen_stage = menu.stage
             elif self.screen_stage == "GAME":
                 game = Game(self.WIDTH, self.HEIGHT, self.FPS, self.clock, sound, self.ball_speed)
-                game.loop(self.WINDOW, self.WIDTH, self.HEIGHT)
+                game.loop(self.WINDOW, self.WIDTH, self.HEIGHT, self.font_20)
                 self.screen_stage = game.stage
             elif self.screen_stage == "OPTIONS":
                 options = Options(self.WIDTH, self.HEIGHT, self.FPS, self.clock, self.font_20, self.font_30, self.c_volume, self.volume, self.ball_speed)
