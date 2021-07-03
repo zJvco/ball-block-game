@@ -1,13 +1,14 @@
 import pygame, sys, os
 
 class Menu:
-    def __init__(self, WIDTH, HEIGHT, FPS, clock, font):
+    def __init__(self, WIDTH, HEIGHT, FPS, clock, font_20):
         self.WIDTH = WIDTH
         self.HEIGHT = HEIGHT
         self.BLACK = (0, 0, 0)
         self.WHITE = (255, 255, 255)
         self.FPS = FPS
         self.clock = clock
+        self.background = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background_image.png")), (500, 700))
         self.logo = pygame.transform.scale(pygame.image.load(os.path.join("assets", "logo_game_ball_block.PNG")), (self.WIDTH - 40, 200))
         self.start_button_normal = pygame.transform.scale(pygame.image.load(os.path.join("assets", "start_normal.PNG")), (200, 80))
         self.start_button_hover = pygame.transform.scale(pygame.image.load(os.path.join("assets", "start_hover.PNG")), (200, 80))
@@ -15,12 +16,12 @@ class Menu:
         self.options_button_hover = pygame.transform.scale(pygame.image.load(os.path.join("assets", "options_hover.PNG")), (220, 80))
         self.exit_button_normal = pygame.transform.scale(pygame.image.load(os.path.join("assets", "exit_normal.PNG")), (160, 80))
         self.exit_button_hover = pygame.transform.scale(pygame.image.load(os.path.join("assets", "exit_hover.PNG")), (160, 80))
-        self.font = font
         self.current_button = 0
-        self.credits_label = self.font.render("Created by João Victor. All rights reserved", 0, self.WHITE)
+        self.credits_label = font_20.render("Created by João Victor. All rights reserved", 0, self.WHITE)
         self.stage = None
 
     def draw(self, WINDOW):
+        WINDOW.blit(self.background, (0, 0))
         WINDOW.blit(self.logo, (20, 10))
 
         if self.current_button == 0:

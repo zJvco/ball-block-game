@@ -1,25 +1,26 @@
-import pygame, sys
+import pygame, sys, os
 from player import Player
 from ball import Ball
 from tiles import Tiles
-from sound import Sound
 
 class Game:
-    def __init__(self, WIDTH, HEIGHT, FPS, clock):
+    def __init__(self, WIDTH, HEIGHT, FPS, clock, sound, ball_speed):
         self.player = Player(WIDTH, HEIGHT)
-        self.ball = Ball(WIDTH, self.player.player_y)
+        self.ball = Ball(WIDTH, self.player.player_y, ball_speed)
         self.tiles = Tiles()
-        self.sound = Sound()
+        self.sound = sound
         self.BLACK = (0, 0, 0)
         self.WHITE = (255, 255, 255)
         self.FPS = FPS
         self.clock = clock
         self.stage = None
+        self.background = pygame.transform.scale(pygame.image.load(os.path.join("assets", "background_image.png")), (500, 700))
+        self.sound.stop_background_music()
 
     def loop(self, WINDOW, WIDTH, HEIGHT):
         run = True
         while run:
-            WINDOW.fill(self.BLACK)
+            WINDOW.blit(self.background, (0, 0))
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -38,6 +39,7 @@ class Game:
 
             if self.ball.ball_y >= HEIGHT - self.ball.ball_size:
                 self.stage = "MENU"
+                self.sound.play_background_music()
                 run = False
 
             if len(self.tiles.block) == 0:
@@ -63,6 +65,7 @@ class Game:
                     self.tiles.phase = self.tiles.phase_6
                 else:
                     self.stage = "MENU"
+                    self.sound.play_background_music()
                     run = False
 
             self.tiles.clear_block_list()

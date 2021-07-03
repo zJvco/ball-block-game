@@ -2,12 +2,12 @@ import pygame
 from math import sqrt
 
 class Ball:
-    def __init__(self, WIDTH, player_y):
+    def __init__(self, WIDTH, player_y, ball_speed):
         self.ball_size = 20
         self.ball_x = WIDTH / 2 - self.ball_size / 2
         self.ball_y = player_y - 50
-        self.ball_speed_x = 10
-        self.ball_speed_y = 10
+        self.ball_speed_x = ball_speed
+        self.ball_speed_y = ball_speed
         
     def update(self):
         self.ball = pygame.Rect(self.ball_x, self.ball_y, self.ball_size, self.ball_size)
@@ -36,4 +36,4 @@ class Ball:
             self.ball_speed_y *= -1
 
     def draw_ball(self, WINDOW, color):
-        pygame.draw.ellipse(WINDOW, color, self.ball, 1)
+        pygame.draw.ellipse(WINDOW, color, self.ball, 0)
